@@ -22,17 +22,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".5"
-        android:id="@+id/result_parent"
+        android:layout_weight=".3"
         android:weightSum="5"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4.6"
+            android:layout_weight="4.7"
             android:textAlignment="textEnd"
-            android:textSize="35sp"
+            android:textSize="20sp"
+            android:textColor="#000000"
             android:singleLine="true"
             android:maxLength="15"
             android:ellipsize="start"
@@ -42,8 +43,8 @@
 
         <ImageButton
             android:layout_width="0dp"
-            android:layout_weight=".4"
-            android:layout_height="30sp"
+            android:layout_weight=".3"
+            android:layout_height="20sp"
             android:layout_gravity="center"
             android:background="@drawable/back"
             android:id="@+id/back"
@@ -57,8 +58,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2.4"
-        android:id="@+id/parent"
+        android:layout_weight="2.6"
         android:orientation="vertical">
 
         <LinearLayout
@@ -68,13 +68,14 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/one"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="1"
                 android:layout_marginEnd="-7dp"
-                android:textSize="15sp"
-                android:id="@+id/one"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="1"
+                android:textSize="15sp" />
+
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -226,7 +227,7 @@
                 android:layout_height="wrap_content"
                 android:text="^"
                 android:id="@+id/power"
-                android:layout_marginEnd="-7.5dp"
+                android:layout_marginEnd="-7dp"
                 android:textSize="15sp"
                 android:layout_weight="1"/>
             <Button
@@ -234,7 +235,7 @@
                 android:layout_height="wrap_content"
                 android:text="√"
                 android:id="@+id/root"
-                android:layout_marginEnd="-7.5dp"
+                android:layout_marginEnd="-7dp"
                 android:textSize="15sp"
                 android:layout_weight="1"/>
 
@@ -244,7 +245,7 @@
                 android:text="("
                 android:id="@+id/fbo"
                 android:textSize="15sp"
-                android:layout_marginEnd="-7.5dp"
+                android:layout_marginEnd="-7dp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
@@ -257,13 +258,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="-11dp"
             android:orientation="horizontal">
 
 
             <Button
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/sound"
                 android:textAllCaps="false"
@@ -273,13 +273,35 @@
 
             <Button
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/equal"
                 android:textAlignment="center"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:text=" ="/>
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <VideoView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/vv"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+
 
 
     </LinearLayout>

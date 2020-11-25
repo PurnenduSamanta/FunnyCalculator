@@ -13,7 +13,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2.1"
+        android:layout_weight="2.2"
         android:id="@+id/image"
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"
@@ -22,17 +22,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".4"
+        android:layout_weight=".3"
         android:id="@+id/result_parent"
         android:weightSum="5"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4.4"
+            android:layout_weight="4.6"
             android:textAlignment="textEnd"
-            android:textSize="35sp"
+            android:textSize="30sp"
+            android:textColor="#000000"
             android:singleLine="true"
             android:maxLength="15"
             android:ellipsize="start"
@@ -42,8 +44,8 @@
 
         <ImageButton
             android:layout_width="0dp"
-            android:layout_weight=".5"
-            android:layout_height="40sp"
+            android:layout_weight=".4"
+            android:layout_height="30sp"
             android:layout_gravity="center"
             android:background="@drawable/back"
             android:id="@+id/back"
@@ -58,7 +60,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2.5"
-        android:id="@+id/parent"
         android:orientation="vertical">
 
         <LinearLayout
@@ -72,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:text="1"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:id="@+id/one"
                 android:layout_weight="1"/>
             <Button
@@ -81,7 +82,7 @@
                 android:layout_marginEnd="-7dp"
                 android:text="2"
                 android:id="@+id/two"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
@@ -89,7 +90,7 @@
                 android:id="@+id/three"
                 android:layout_marginEnd="-7dp"
                 android:text="3"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
 
             <Button
@@ -98,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="+"
-                android:textSize="30sp" />
+                android:textSize="25sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -112,7 +113,7 @@
                 android:text="4"
                 android:id="@+id/four"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
@@ -120,7 +121,7 @@
                 android:text="5"
                 android:id="@+id/five"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
@@ -128,14 +129,14 @@
                 android:text="6"
                 android:id="@+id/six"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="-"
                 android:id="@+id/minus"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
         </LinearLayout>
         <LinearLayout
@@ -150,7 +151,7 @@
                 android:text="7"
                 android:id="@+id/seven"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
@@ -158,7 +159,7 @@
                 android:text="8"
                 android:id="@+id/eight"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
@@ -166,14 +167,14 @@
                 android:text="9"
                 android:id="@+id/nine"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="×"
                 android:id="@+id/mul"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
         </LinearLayout>
 
@@ -189,7 +190,7 @@
                 android:text="0"
                 android:id="@+id/zero"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
@@ -197,7 +198,7 @@
                 android:text="."
                 android:id="@+id/decimal"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
@@ -205,14 +206,14 @@
                 android:text="CLR"
                 android:id="@+id/clear"
                 android:layout_marginEnd="-7dp"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="/"
                 android:id="@+id/div"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
         </LinearLayout>
         <LinearLayout
@@ -226,16 +227,16 @@
                 android:layout_height="wrap_content"
                 android:text="^"
                 android:id="@+id/power"
-                android:layout_marginEnd="-7.5dp"
-                android:textSize="30sp"
+                android:layout_marginEnd="-7dp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="√"
                 android:id="@+id/root"
-                android:layout_marginEnd="-7.5dp"
-                android:textSize="30sp"
+                android:layout_marginEnd="-7dp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
 
             <Button
@@ -243,43 +244,64 @@
                 android:layout_height="wrap_content"
                 android:text="("
                 android:id="@+id/fbo"
-                android:textSize="30sp"
-                android:layout_marginEnd="-7.5dp"
+                android:textSize="25sp"
+                android:layout_marginEnd="-7dp"
                 android:layout_weight="1"/>
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text=")"
                 android:id="@+id/fbc"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_weight="1"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="-11dp"
             android:orientation="horizontal">
 
 
             <Button
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/sound"
                 android:textAllCaps="false"
                 android:layout_marginEnd="-7dp"
-                android:textSize="25sp"
+                android:textSize="30sp"
                 android:text="Sound"/>
 
             <Button
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/equal"
                 android:textAlignment="center"
                 android:textSize="30sp"
                 android:text=" ="/>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <VideoView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/vv"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
 
 
     </LinearLayout>

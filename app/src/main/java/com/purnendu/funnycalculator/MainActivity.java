@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
+
 import com.bumptech.glide.Glide;
 import com.udojava.evalex.Expression;
 import java.math.BigDecimal;
@@ -46,10 +48,11 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
     private TextView result;
     private Button one, two, three, four, five, six, seven, eight, nine, zero, decimal, power, fbo, fbc, root, clear, equal,    add, minus, mul, div, sound;
     private ImageButton back;
-    private LinearLayout parent,result_parent;
+    private LinearLayout result_parent;
     private final String[] Colours = {"#81ecec", "#74b9ff", "#ffeaa7", "#dfe6e9", "#fd79a8", "#e17055", "#fdcb6e", "#f6e58d", "#badc58", "#dff9fb", "#ff7979", "#c7ecee", "#7ed6df", "#e056fd", "#686de0", "#95afc0", "#22a6b3", "#4834d4", "#9c88ff", "#fbc531", "#4cd137", "#00a8ff", "#e84118", "#7f8fa6","#ff9ff3","#feca57","#ff6b6b","#48dbfb","#1dd1a1","#c8d6e5","#5f27cd","#f368e0","#8395a7","#ff7f50","#a4b0be","#ffa502","#7bed9f","#70a1ff","#dfe4ea","#eccc68","#3742fa","#8854d0","#fc5c65","#fed330","#26de81","#778ca3","#D6A2E8","#9AECDB","#25CCF7","#EAB543"};
     private boolean tone = true;
     private MediaPlayer mp;
+    private VideoView vv;
     SharedPreferences sharedPreferences1;
     private String temp="";
     private int track_Image=0,track_Ans_Press=0;
@@ -58,7 +61,6 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        parent = findViewById(R.id.parent);
         result_parent = findViewById(R.id.result_parent);
         image = findViewById(R.id.image);
         result = findViewById(R.id.result);
@@ -85,9 +87,9 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         minus = findViewById(R.id.minus);
         mul = findViewById(R.id.mul);
         div = findViewById(R.id.div);
+        vv=findViewById(R.id.vv);
 
         mp = MediaPlayer.create(this, R.raw.tone);
-
 
         one.setOnClickListener(this);
         two.setOnClickListener(this);
@@ -116,7 +118,24 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         colourChange();
 
 
-         String PACKAGE_NAME = getApplicationContext().getPackageName();
+
+        vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp1) {
+                vv.start(); //need to make transition seamless.
+            }
+        });
+
+        Uri uri1 = Uri.parse("android.resource://com.purnendu.funnycalculator/"
+                + R.raw.fish);
+
+        vv.setVideoURI(uri1);
+        vv.requestFocus();
+        vv.start();
+
+
+
+
+        String PACKAGE_NAME = getApplicationContext().getPackageName();
         sharedPreferences1 = getSharedPreferences("IMAGE", MODE_PRIVATE);
         Uri path = Uri.parse("android.resource://" + PACKAGE_NAME + "/" + R.drawable.cartoon1);
         String imgPath = path.toString();
@@ -184,6 +203,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         });
 
 
+    }
+
+    @Override
+    protected void onPostResume() {
+
+        vv.start();
+
+        super.onPostResume();
     }
 
     @SuppressLint("SetTextI18n")
@@ -613,7 +640,6 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         root.setBackgroundColor(Color.parseColor(bc));
         fbo.setBackgroundColor(Color.parseColor(bc));
         fbc.setBackgroundColor(Color.parseColor(bc));
-        parent.setBackgroundColor(Color.parseColor(bc));
         result_parent.setBackgroundColor(Color.parseColor(bc_plus_one));
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor(bc_plus_two));
         Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(colorDrawable);
@@ -644,7 +670,7 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
             else if(item.getItemId()==R.id.about) {
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
                 builder1.setTitle("About");
-                String messege = "Funny Calculator works to provide you clean,simple,colourful UI with best user experience on your way of calculation. Do write to us with your feedback or copyright queries at";
+                String messege = "Funny Calculator works to provide you clean,simple,colourful UI with best user experience on your way of calculation.The video used in the application from Cassio Toledo youtube video.  Do write to us with your feedback or copyright queries at";
                 String messege1 = "joysamanta123@gmail.com";
                 SpannableStringBuilder builder = new SpannableStringBuilder();
                 builder.append(messege);
@@ -777,7 +803,7 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         root.setBackgroundColor(Color.parseColor("#bdc3c7"));
         fbo.setBackgroundColor(Color.parseColor("#bdc3c7"));
         fbc.setBackgroundColor(Color.parseColor("#bdc3c7"));
-        parent.setBackgroundColor(Color.parseColor("#bdc3c7"));
+        //parent.setBackgroundColor(Color.parseColor("#bdc3c7"));
         result_parent.setBackgroundColor(Color.parseColor("#bdc3c7"));
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#bdc3c7"));
         Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(colorDrawable);

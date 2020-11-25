@@ -7,7 +7,7 @@
         android:focusable="true"
         android:id="@+id/cb"
         app:showAsAction="never"
-        android:title="Change Background"/>
+        android:title="Change Picture"/>
     <item
         android:id="@+id/rating"
         app:showAsAction="never"

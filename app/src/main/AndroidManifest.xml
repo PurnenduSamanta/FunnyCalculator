@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.purnendu.funnycalculator">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <supports-screens android:smallScreens="false"
+        android:normalScreens="true"
+        android:largeScreens="false"
+        android:xlargeScreens="false"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/icon"
