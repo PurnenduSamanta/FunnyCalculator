@@ -1,6 +1,8 @@
 # FunnyCalculator
 Funny Calculator works to provide you clean,simple,colourful UI with best user experience on your way of calculation.
 
+Checkout the app at  https://play.google.com/store/apps/details?id=com.purnendu.funnycalculator
+
 ![1](https://user-images.githubusercontent.com/69786552/103309962-81234e80-4a3c-11eb-8e2d-23ac7c477c05.jpg)
 
 ![2](https://user-images.githubusercontent.com/69786552/103309979-88e2f300-4a3c-11eb-8d94-b9baa445f55f.jpg)
