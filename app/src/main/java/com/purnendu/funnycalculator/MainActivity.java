@@ -1,19 +1,21 @@
 package com.purnendu.funnycalculator;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,40 +24,40 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.udojava.evalex.Expression;
-import java.math.BigDecimal;
-import java.util.Objects;
 
-public   class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import java.math.BigDecimal;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView image;
-    private static final int PICK_IMAGE = 100;
-    private static final int STORAGE_PERMISSION_CODE=101;
+    private static final int STORAGE_PERMISSION_CODE = 101;
     private Uri imageUri;
-    private double ans1=0;
+    private double ans1 = 0;
     private TextView result;
-    private Button one, two, three, four, five, six, seven, eight, nine, zero, decimal, power, fbo, fbc, root, clear, equal,    add, minus, mul, div, sound;
-    private ImageButton back;
+    private Button one, two, three, four, five, six, seven, eight, nine, zero, decimal, power, fbo, fbc, root, clear, equal, add, minus, mul, div, sound;
     private LinearLayout result_parent;
-    private final String[] Colours = {"#81ecec", "#74b9ff", "#ffeaa7", "#dfe6e9", "#fd79a8", "#e17055", "#fdcb6e", "#f6e58d", "#badc58", "#dff9fb", "#ff7979", "#c7ecee", "#7ed6df", "#e056fd", "#686de0", "#95afc0", "#22a6b3", "#4834d4", "#9c88ff", "#fbc531", "#4cd137", "#00a8ff", "#e84118", "#7f8fa6","#ff9ff3","#feca57","#ff6b6b","#48dbfb","#1dd1a1","#c8d6e5","#5f27cd","#f368e0","#8395a7","#ff7f50","#a4b0be","#ffa502","#7bed9f","#70a1ff","#dfe4ea","#eccc68","#3742fa","#8854d0","#fc5c65","#fed330","#26de81","#778ca3","#D6A2E8","#9AECDB","#25CCF7","#EAB543"};
+    private final String[] Colours = {"#81ecec", "#74b9ff", "#ffeaa7", "#dfe6e9", "#fd79a8", "#e17055", "#fdcb6e", "#f6e58d", "#badc58", "#dff9fb", "#ff7979", "#c7ecee", "#7ed6df", "#e056fd", "#686de0", "#95afc0", "#22a6b3", "#4834d4", "#9c88ff", "#fbc531", "#4cd137", "#00a8ff", "#e84118", "#7f8fa6", "#ff9ff3", "#feca57", "#ff6b6b", "#48dbfb", "#1dd1a1", "#c8d6e5", "#5f27cd", "#f368e0", "#8395a7", "#ff7f50", "#a4b0be", "#ffa502", "#7bed9f", "#70a1ff", "#dfe4ea", "#eccc68", "#3742fa", "#8854d0", "#fc5c65", "#fed330", "#26de81", "#778ca3", "#D6A2E8", "#9AECDB", "#25CCF7", "#EAB543"};
     private boolean tone = true;
     private MediaPlayer mp;
     private VideoView vv;
     SharedPreferences sharedPreferences1;
-    private String temp="";
-    private int track_Image=0,track_Ans_Press=0;
+    private String temp = "";
+    private int track_Image = 0, track_Ans_Press = 0;
+    private ActivityResultLauncher<Intent> someActivityResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +84,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         clear = findViewById(R.id.clear);
         equal = findViewById(R.id.equal);
         sound = findViewById(R.id.sound);
-        back = findViewById(R.id.back);
+        ImageButton back = findViewById(R.id.back);
         add = findViewById(R.id.add);
         minus = findViewById(R.id.minus);
         mul = findViewById(R.id.mul);
         div = findViewById(R.id.div);
-        vv=findViewById(R.id.vv);
+        vv = findViewById(R.id.vv);
+
+        ImageView optionButton = findViewById(R.id.optionButton);
 
         mp = MediaPlayer.create(this, R.raw.tone);
 
@@ -115,14 +119,22 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         mul.setOnClickListener(this);
         div.setOnClickListener(this);
 
+        pickImageFromGallery();
+
         colourChange();
 
 
+        optionButton.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(this, view);
+            MenuInflater inflater = popup.getMenuInflater();
+            inflater.inflate(R.menu.menu, popup.getMenu());
+            popup.show();
+            menuItemSelectedListener(popup);
+        });
 
-        vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            public void onCompletion(MediaPlayer mp1) {
-                vv.start(); //need to make transition seamless.
-            }
+
+        vv.setOnCompletionListener(mp1 -> {
+            vv.start(); //need to make transition seamless.
         });
 
         Uri uri1 = Uri.parse("android.resource://com.purnendu.funnycalculator/"
@@ -131,8 +143,6 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         vv.setVideoURI(uri1);
         vv.requestFocus();
         vv.start();
-
-
 
 
         String PACKAGE_NAME = getApplicationContext().getPackageName();
@@ -148,10 +158,9 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } catch (IllegalArgumentException e) {
                     Toast.makeText(this, "Background Pic is not available,pls reinstall the app", Toast.LENGTH_SHORT).show();
                 }
-            }
-           else if(!imageUriString.equals(imgPath)) {
-                track_Image=0;
-                if(permissionHandle(Manifest.permission.READ_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE)) {
+            } else {
+                track_Image = 0;
+                if (permissionHandle()) {
                     try {
                         imageUri = Uri.parse(imageUriString);
                         Glide.with(MainActivity.this).load(imageUri).into(image);
@@ -159,9 +168,7 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                         path = Uri.parse("android.resource://" + PACKAGE_NAME + "/" + R.drawable.cartoon1);
                         Glide.with(MainActivity.this).load(path).into(image);
                     }
-                }
-                else
-                {
+                } else {
                     try {
                         imageUri = Uri.parse(imgPath);
                         Glide.with(MainActivity.this).load(imageUri).into(image);
@@ -170,47 +177,79 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 }
             }
-           else
-            {
-                Toast.makeText(this, "Something Wrong Happened", Toast.LENGTH_SHORT).show();
-            }
         }
 
 
-
-
-
-
-        result.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ((result.getText().toString().length() > 9)&&(track_Ans_Press==0)) {
-                    AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
-                    builder1.setMessage(result.getText().toString());
-                    builder1.setCancelable(true);
-                    AlertDialog alert11 = builder1.create();
-                    alert11.show();
-                }
-                else if(track_Ans_Press==1)
-                {
-                    AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
-                    builder1.setMessage(String.valueOf(ans1));
-                    builder1.setCancelable(true);
-                    AlertDialog alert11 = builder1.create();
-                    alert11.show();
-                }
+        result.setOnClickListener(v -> {
+            if ((result.getText().toString().length() > 9) && (track_Ans_Press == 0)) {
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+                builder1.setMessage(result.getText().toString());
+                builder1.setCancelable(true);
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+            } else if (track_Ans_Press == 1) {
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+                builder1.setMessage(String.valueOf(ans1));
+                builder1.setCancelable(true);
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
             }
         });
 
 
     }
 
+    private void menuItemSelectedListener(PopupMenu popup) {
+
+        popup.setOnMenuItemClickListener(item -> {
+
+            if (item.getItemId() == R.id.cb) {
+                Toast.makeText(MainActivity.this, "Press once more time  to confirm", Toast.LENGTH_SHORT).show();
+                permissionHandle();
+                track_Image = 1;
+                return true;
+            } else if (item.getItemId() == R.id.about) {
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
+                builder1.setTitle("About");
+                String messege = "Funny Calculator works to provide you clean,simple,colourful UI with best user experience on your way of calculation.The video used in the application from Cassio Toledo youtube video.  Do write to us with your feedback or copyright queries at";
+                String messege1 = "joysamanta123@gmail.com";
+                SpannableStringBuilder builder = new SpannableStringBuilder();
+                builder.append(messege);
+                builder.append(" ");
+                SpannableString ss = new SpannableString(messege1);
+                ss.setSpan(new ForegroundColorSpan(Color.RED), 0, messege1.length(), 0);
+                builder.append(ss);
+                builder1.setMessage(builder);
+                builder1.setCancelable(true);
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+                return (true);
+            } else if (item.getItemId() == R.id.rating) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(
+                            "https://play.google.com/store/apps/details?id=com.purnendu.funnycalculator"));
+                    intent.setPackage("com.android.vending");
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(MainActivity.this, "You don't have any app to perform this action ", Toast.LENGTH_SHORT).show();
+                }
+                return (true);
+            }
+            return false;
+        });
+    }
+
     @Override
     protected void onPostResume() {
-
         vv.start();
-
         super.onPostResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        vv.pause();
     }
 
     @SuppressLint("SetTextI18n")
@@ -225,16 +264,16 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "1");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
 
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
-                   colourSetWhite();
+                if (result.getText().toString().length() == 15) {
+                    colourSetWhite();
                 }
                 break;
             case (R.id.two):
@@ -243,14 +282,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "2");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -261,14 +300,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "3");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -278,14 +317,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "4");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -295,14 +334,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "5");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -312,14 +351,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "6");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -329,14 +368,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "7");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -346,14 +385,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "8");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -363,14 +402,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "9");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -380,14 +419,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "0");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -397,14 +436,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + ".");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -414,14 +453,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "^");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
@@ -431,28 +470,28 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     result.setText(result.getText().toString() + "(");
                 }
-                track_Ans_Press=0;
+                track_Ans_Press = 0;
                 if (tone) {
                     mp.start();
                 }
-                if(result.getText().toString().length()<15) {
+                if (result.getText().toString().length() < 15) {
                     colourChange();
                 }
-                if(result.getText().toString().length()==15) {
+                if (result.getText().toString().length() == 15) {
                     colourSetWhite();
                 }
                 break;
             case (R.id.fbc):
                 if (!((result.getText().toString().equals("00")) || (result.getText().toString().equals("")))) {
                     result.setText(result.getText().toString() + ")");
-                    track_Ans_Press=0;
+                    track_Ans_Press = 0;
                     if (tone) {
                         mp.start();
                     }
-                    if(result.getText().toString().length()<15) {
+                    if (result.getText().toString().length() < 15) {
                         colourChange();
                     }
-                    if(result.getText().toString().length()==15) {
+                    if (result.getText().toString().length() == 15) {
                         colourSetWhite();
                     }
                 }
@@ -464,9 +503,7 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                     char last = result.getText().toString().charAt(result.getText().toString().length() - 1);
                     if (Character.isDigit(last)) {
                         result.setText(result.getText().toString() + "×√(");
-                    }
-                    else
-                    {
+                    } else {
                         result.setText(result.getText().toString() + "√(");
                     }
                 }
@@ -486,7 +523,7 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                     Toast.makeText(this, "Nothing Input", Toast.LENGTH_SHORT).show();
                 } else {
                     result.setText("");
-                    track_Ans_Press=0;
+                    track_Ans_Press = 0;
                     if (tone) {
                         mp.start();
                     }
@@ -497,18 +534,22 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 if ((result.getText().toString().equals("00")) || (result.getText().toString().equals(""))) {
                     Toast.makeText(this, "Nothing Input", Toast.LENGTH_SHORT).show();
                 } else {
-                    if(!result.getText().toString().equals(temp)) {
+                    if (!result.getText().toString().equals(temp)) {
                         String string = result.getText().toString();
                         String replaced = string.replace("√", "SQRT");
-                         replaced = replaced.replace("×", "*");
+                        replaced = replaced.replace("×", "*");
                         try {
                             Expression expression = new Expression(replaced);
                             expression.setPrecision(10);
                             BigDecimal ans = expression.eval();
-                            ans1=ans.doubleValue();
+                            ans1 = ans.doubleValue();
+                            String resultString=String.valueOf(ans1);
+                            Log.d("hello", resultString);
+                            if(resultString.endsWith(".0"))
+                                resultString=resultString.replace(".0","");
                             result.setEllipsize(TextUtils.TruncateAt.END);
-                            result.setText(String.valueOf(ans1));
-                            track_Ans_Press=1;
+                            result.setText(resultString);
+                            track_Ans_Press = 1;
                             if (tone) {
                                 mp.start();
                             }
@@ -526,7 +567,7 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     if (!result.getText().toString().equals("")) {
                         String string = result.getText().toString().substring(0, result.getText().toString().length() - 1);
-                        track_Ans_Press=0;
+                        track_Ans_Press = 0;
                         if (tone) {
                             mp.start();
                         }
@@ -537,14 +578,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
             case (R.id.add):
                 if (!result.getText().toString().equals("")) {
                     result.setText(result.getText().toString() + "+");
-                    track_Ans_Press=0;
+                    track_Ans_Press = 0;
                     if (tone) {
                         mp.start();
                     }
-                    if(result.getText().toString().length()<15) {
+                    if (result.getText().toString().length() < 15) {
                         colourChange();
                     }
-                    if(result.getText().toString().length()==15) {
+                    if (result.getText().toString().length() == 15) {
                         colourSetWhite();
                     }
                 }
@@ -552,14 +593,14 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
             case (R.id.minus):
                 if (!result.getText().toString().equals("")) {
                     result.setText(result.getText().toString() + "-");
-                    track_Ans_Press=0;
+                    track_Ans_Press = 0;
                     if (tone) {
                         mp.start();
                     }
-                    if(result.getText().toString().length()<15) {
+                    if (result.getText().toString().length() < 15) {
                         colourChange();
                     }
-                    if(result.getText().toString().length()==15) {
+                    if (result.getText().toString().length() == 15) {
                         colourSetWhite();
                     }
                 }
@@ -567,32 +608,32 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
             case (R.id.mul):
                 if (!result.getText().toString().equals("")) {
                     result.setText(result.getText().toString() + "×");
-                    track_Ans_Press=0;
+                    track_Ans_Press = 0;
                     if (tone) {
                         mp.start();
                     }
-                    if(result.getText().toString().length()<15) {
+                    if (result.getText().toString().length() < 15) {
                         colourChange();
                     }
-                    if(result.getText().toString().length()==15) {
+                    if (result.getText().toString().length() == 15) {
                         colourSetWhite();
                     }
                 }
                 break;
             case (R.id.div):
-                    if (!result.getText().toString().equals("")) {
-                        result.setText(result.getText().toString() + "/");
-                        track_Ans_Press=0;
-                        if (tone) {
-                            mp.start();
-                        }
-                        if(result.getText().toString().length()<15) {
-                            colourChange();
-                        }
-                        if(result.getText().toString().length()==15) {
-                            colourSetWhite();
-                        }
+                if (!result.getText().toString().equals("")) {
+                    result.setText(result.getText().toString() + "/");
+                    track_Ans_Press = 0;
+                    if (tone) {
+                        mp.start();
                     }
+                    if (result.getText().toString().length() < 15) {
+                        colourChange();
+                    }
+                    if (result.getText().toString().length() == 15) {
+                        colourSetWhite();
+                    }
+                }
                 break;
             case (R.id.sound):
                 if (tone) {
@@ -616,8 +657,7 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         SharedPreferences sharedPreferences = getSharedPreferences("colour", MODE_PRIVATE);
         int arrayIndex = sharedPreferences.getInt("hex", 0);
         String bc = Colours[arrayIndex];
-        String bc_plus_one=Colours[arrayIndex+1];
-        String bc_plus_two=Colours[arrayIndex+2];
+        String bc_plus_one = Colours[arrayIndex + 1];
         one.setBackgroundColor(Color.parseColor(bc));
         two.setBackgroundColor(Color.parseColor(bc));
         three.setBackgroundColor(Color.parseColor(bc));
@@ -641,8 +681,6 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         fbo.setBackgroundColor(Color.parseColor(bc));
         fbc.setBackgroundColor(Color.parseColor(bc));
         result_parent.setBackgroundColor(Color.parseColor(bc_plus_one));
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor(bc_plus_two));
-        Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(colorDrawable);
 
         arrayIndex++;
         if (arrayIndex > 47) {
@@ -655,100 +693,30 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-            if(item.getItemId()==R.id.cb) {
-                Toast.makeText(this, "Press once more time  to confirm", Toast.LENGTH_SHORT).show();
-                permissionHandle(Manifest.permission.READ_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
-                track_Image = 1;
-                return true;
-            }
-            else if(item.getItemId()==R.id.about) {
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
-                builder1.setTitle("About");
-                String messege = "Funny Calculator works to provide you clean,simple,colourful UI with best user experience on your way of calculation.The video used in the application from Cassio Toledo youtube video.  Do write to us with your feedback or copyright queries at";
-                String messege1 = "joysamanta123@gmail.com";
-                SpannableStringBuilder builder = new SpannableStringBuilder();
-                builder.append(messege);
-                builder.append(" ");
-                SpannableString ss = new SpannableString(messege1);
-                ss.setSpan(new ForegroundColorSpan(Color.RED), 0, messege1.length(), 0);
-                builder.append(ss);
-                builder1.setMessage(builder);
-                builder1.setCancelable(true);
-                AlertDialog alert11 = builder1.create();
-                alert11.show();
-                return (true);
-            }
-            else if(item.getItemId()==R.id.rating)
-            {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(
-                            "https://play.google.com/store/apps/details?id=com.purnendu.funnycalculator"));
-                    intent.setPackage("com.android.vending");
-                    startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(MainActivity.this, "You don't have any app to perform this action ", Toast.LENGTH_SHORT).show();
-                }
-                return (true);
-        }
-            else
-        return (super.onOptionsItemSelected(item));
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        sharedPreferences1=getSharedPreferences("IMAGE",MODE_PRIVATE);
-        SharedPreferences.Editor Image = sharedPreferences1.edit();
-        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
-            if(data!=null)
-            {
-                imageUri = data.getData();
-                if(imageUri!=null)
-                {
-                    Image.putString("url",imageUri.toString());
-                    Image.apply();
-                    Glide.with(MainActivity.this).load(imageUri).into(image);
-
-                }
-            }
-        }
-    }
-    boolean permissionHandle(String permission, int requestCode)
-    {
-        if(track_Image==1) {
-            if (ContextCompat.checkSelfPermission(MainActivity.this, permission)
+    boolean permissionHandle() {
+        if (track_Image == 1) {
+            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{permission},
-                        requestCode);
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MainActivity.STORAGE_PERMISSION_CODE);
                 return false;
             } else {
                 try {
                     Intent gallery = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(gallery, PICK_IMAGE);
+                    someActivityResultLauncher.launch(gallery);
                     return true;
-                }
-                catch (ActivityNotFoundException e)
-                {
+                } catch (ActivityNotFoundException e) {
                     Toast.makeText(this, "You do not have any app to perform this action", Toast.LENGTH_SHORT).show();
-                    return  false;
+                    return false;
                 }
             }
         }
-        if(track_Image==0)
-        {
-            return ContextCompat.checkSelfPermission(MainActivity.this, permission)
-                    == PackageManager.PERMISSION_GRANTED;
+        if (track_Image == 0) {
+            return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
 
-    return false;
+        return false;
     }
 
     @Override
@@ -759,28 +727,24 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 try {
                     Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(gallery, PICK_IMAGE);
+                    someActivityResultLauncher.launch(gallery);
                     Toast.makeText(MainActivity.this,
-                            "Storage Permission Granted",
-                            Toast.LENGTH_SHORT)
+                                    "Storage Permission Granted",
+                                    Toast.LENGTH_SHORT)
                             .show();
-                }
-                catch (ActivityNotFoundException e)
-                {
+                } catch (ActivityNotFoundException e) {
                     Toast.makeText(this, "You do not have any app to perform this action", Toast.LENGTH_SHORT).show();
                 }
-            }
-            else {
+            } else {
                 Toast.makeText(MainActivity.this,
-                        "Storage Permission Denied,Give storage permission manually by going to app setting ",
-                        Toast.LENGTH_LONG)
+                                "Storage Permission Denied,Give storage permission manually by going to app setting ",
+                                Toast.LENGTH_LONG)
                         .show();
             }
         }
     }
 
-    public void colourSetWhite()
-    {
+    public void colourSetWhite() {
         one.setBackgroundColor(Color.parseColor("#bdc3c7"));
         two.setBackgroundColor(Color.parseColor("#bdc3c7"));
         three.setBackgroundColor(Color.parseColor("#bdc3c7"));
@@ -805,7 +769,27 @@ public   class MainActivity extends AppCompatActivity implements View.OnClickLis
         fbc.setBackgroundColor(Color.parseColor("#bdc3c7"));
         //parent.setBackgroundColor(Color.parseColor("#bdc3c7"));
         result_parent.setBackgroundColor(Color.parseColor("#bdc3c7"));
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#bdc3c7"));
-        Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(colorDrawable);
+    }
+
+    private void pickImageFromGallery() {
+        someActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        sharedPreferences1 = getSharedPreferences("IMAGE", MODE_PRIVATE);
+                        SharedPreferences.Editor Image = sharedPreferences1.edit();
+                        if (data != null) {
+                            imageUri = data.getData();
+                            if (imageUri != null) {
+                                Image.putString("url", imageUri.toString());
+                                Image.apply();
+                                Glide.with(MainActivity.this).load(imageUri).into(image);
+
+                            }
+                        }
+
+                    }
+                });
     }
 }
