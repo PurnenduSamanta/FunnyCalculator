@@ -1,25 +1,18 @@
 package com.purnendu.funnycalculator;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -44,7 +37,6 @@ import java.math.BigDecimal;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView image;
-    private static final int STORAGE_PERMISSION_CODE = 101;
     private Uri imageUri;
     private double ans1 = 0;
     private TextView result;
@@ -56,8 +48,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private VideoView vv;
     SharedPreferences sharedPreferences1;
     private String temp = "";
-    private int track_Image = 0, track_Ans_Press = 0;
-    private ActivityResultLauncher<Intent> someActivityResultLauncher;
+    private int  track_Ans_Press = 0;
+    ActivityResultLauncher<PickVisualMediaRequest> photoPicker = registerForActivityResult(
+            new ActivityResultContracts.PickVisualMedia(), uri -> {
+                if (uri != null) {
+                    imageUri = uri;
+                    sharedPreferences1 = getSharedPreferences("IMAGE", MODE_PRIVATE);
+                    SharedPreferences.Editor Image = sharedPreferences1.edit();
+                    if (imageUri != null) {
+                        Image.putString("url", imageUri.toString());
+                        Image.apply();
+                        Glide.with(MainActivity.this).load(imageUri).into(image);
+
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "Image Pick cancelled", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mul.setOnClickListener(this);
         div.setOnClickListener(this);
 
-        pickImageFromGallery();
 
         colourChange();
 
@@ -159,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, "Background Pic is not available,pls reinstall the app", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                track_Image = 0;
                 if (permissionHandle()) {
                     try {
                         imageUri = Uri.parse(imageUriString);
@@ -204,9 +209,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         popup.setOnMenuItemClickListener(item -> {
 
             if (item.getItemId() == R.id.cb) {
-                Toast.makeText(MainActivity.this, "Press once more time  to confirm", Toast.LENGTH_SHORT).show();
                 permissionHandle();
-                track_Image = 1;
                 return true;
             } else if (item.getItemId() == R.id.about) {
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
@@ -543,10 +546,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             expression.setPrecision(10);
                             BigDecimal ans = expression.eval();
                             ans1 = ans.doubleValue();
-                            String resultString=String.valueOf(ans1);
+                            String resultString = String.valueOf(ans1);
                             Log.d("hello", resultString);
-                            if(resultString.endsWith(".0"))
-                                resultString=resultString.replace(".0","");
+                            if (resultString.endsWith(".0"))
+                                resultString = resultString.replace(".0", "");
                             result.setEllipsize(TextUtils.TruncateAt.END);
                             result.setText(resultString);
                             track_Ans_Press = 1;
@@ -694,54 +697,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     boolean permissionHandle() {
-        if (track_Image == 1) {
-            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MainActivity.STORAGE_PERMISSION_CODE);
-                return false;
-            } else {
-                try {
-                    Intent gallery = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    someActivityResultLauncher.launch(gallery);
-                    return true;
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(this, "You do not have any app to perform this action", Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-            }
-        }
-        if (track_Image == 0) {
-            return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-        }
+        photoPicker.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
+        return true;
 
-        return false;
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                try {
-                    Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    someActivityResultLauncher.launch(gallery);
-                    Toast.makeText(MainActivity.this,
-                                    "Storage Permission Granted",
-                                    Toast.LENGTH_SHORT)
-                            .show();
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(this, "You do not have any app to perform this action", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(MainActivity.this,
-                                "Storage Permission Denied,Give storage permission manually by going to app setting ",
-                                Toast.LENGTH_LONG)
-                        .show();
-            }
-        }
     }
 
     public void colourSetWhite() {
@@ -769,27 +730,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fbc.setBackgroundColor(Color.parseColor("#bdc3c7"));
         //parent.setBackgroundColor(Color.parseColor("#bdc3c7"));
         result_parent.setBackgroundColor(Color.parseColor("#bdc3c7"));
-    }
-
-    private void pickImageFromGallery() {
-        someActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        sharedPreferences1 = getSharedPreferences("IMAGE", MODE_PRIVATE);
-                        SharedPreferences.Editor Image = sharedPreferences1.edit();
-                        if (data != null) {
-                            imageUri = data.getData();
-                            if (imageUri != null) {
-                                Image.putString("url", imageUri.toString());
-                                Image.apply();
-                                Glide.with(MainActivity.this).load(imageUri).into(image);
-
-                            }
-                        }
-
-                    }
-                });
     }
 }
