@@ -6,13 +6,13 @@ plugins {
 
 android {
     namespace 'com.purnendu.funnycalculator'
-    compileSdk 34
+    compileSdk 37
 
     defaultConfig {
         minSdk 26
-        targetSdk 34
-        versionCode 5
-        versionName "2.3"
+        targetSdk 37
+        versionCode 6
+        versionName "2.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -46,12 +46,12 @@ android {
 }
 
 dependencies {
-    implementation "androidx.activity:activity:1.7.2"
+    implementation "androidx.activity:activity:1.13.0"
     implementation 'com.udojava:EvalEx:2.7'
-    implementation 'com.github.bumptech.glide:glide:4.16.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.github.bumptech.glide:glide:5.0.9'
+    annotationProcessor 'com.github.bumptech.glide:compiler:5.0.9'
+    implementation 'com.google.android.material:material:1.14.0'
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
 }
